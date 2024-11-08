@@ -1,4 +1,5 @@
-import { Hotel } from "../interface";
+
+import { Hotel, FormState } from "../interface";
 
 export async function fetchHotels(): Promise<Hotel[]> {
   const response = await fetch("http://localhost:5000/api/v1/hotels");
@@ -9,7 +10,7 @@ export async function fetchHotels(): Promise<Hotel[]> {
   return data.data || [];
 }
 
-export async function createHotel(hotelData: Hotel) {
+export async function createHotel(hotelData: FormState) {
   const response = await fetch("http://localhost:5000/api/v1/hotels", {
     method: "POST",
     headers: {
@@ -23,3 +24,4 @@ export async function createHotel(hotelData: Hotel) {
   }
   return await response.json();
 }
+
