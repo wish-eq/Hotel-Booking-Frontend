@@ -13,7 +13,7 @@ export default function TopMenuPanel({ role, sessionUser }: { role: string, sess
       text-white font-normal w-screen backdrop-blur-lg dark:bg-slate-200 dark:text-black`}
             >
                 <Image
-                    src="/images/logo.png"
+                    src="/images/background.jpg"
                     className="ml-[10%] w-[80px] h-[80px]"
                     alt="logo"
                     width={1000}

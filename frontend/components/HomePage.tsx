@@ -6,16 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-    const [index, setIndex] = useState(0);
     const router = useRouter();
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIndex(index + 1);
-        }, 3000);
-
-        return () => clearTimeout(timer);
-    }, [index]);
-
 
     const { data: session } = useSession();
 
