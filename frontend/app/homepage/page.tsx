@@ -2,8 +2,14 @@
 
 import { useEffect, useState, ChangeEvent } from "react";
 import TopMenu from "@/app/components/TopMenu";
-import { fetchHotels, createHotel } from "@/app/services/hotelService";
-import { Hotel } from "./interface";
+import {
+  fetchHotels,
+  createHotel,
+  deleteHotel,
+  updateHotel,
+} from "@/app/services/hotelService";
+import { Hotel } from "../interface";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface FormState {
   name: string;
@@ -17,7 +23,7 @@ interface FormState {
 
 export default function Home() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
-  const [form, setForm] = useState<FormState>({
+  const [createForm, setCreateForm] = useState<FormState>({
     name: "",
     address: "",
     district: "",
@@ -26,6 +32,17 @@ export default function Home() {
     tel: "",
     picture: "",
   });
+  const [editForm, setEditForm] = useState<FormState>({
+    name: "",
+    address: "",
+    district: "",
+    province: "",
+    postalcode: "",
+    tel: "",
+    picture: "",
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentHotelId, setCurrentHotelId] = useState<string | null>(null);
 
   useEffect(() => {
     async function getHotels() {
@@ -39,24 +56,172 @@ export default function Home() {
     getHotels();
   }, []);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    formType: "create" | "edit"
+  ) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const newValue =
+      name === "tel"
+        ? value.slice(0, 10)
+        : name === "postalcode"
+        ? value.slice(0, 5)
+        : value;
+    if (formType === "create") {
+      setCreateForm({ ...createForm, [name]: newValue });
+    } else {
+      setEditForm({ ...editForm, [name]: newValue });
+    }
   };
 
   const handleSubmit = async () => {
     try {
-      // Assuming createHotel function takes a FormState object and sends a POST request
-      await createHotel(form);
+      await createHotel(createForm);
       alert("Hotel created successfully!");
+      setCreateForm({
+        name: "",
+        address: "",
+        district: "",
+        province: "",
+        postalcode: "",
+        tel: "",
+        picture: "",
+      });
+      // Refresh the hotel list
+      const updatedHotels = await fetchHotels();
+      setHotels(updatedHotels);
     } catch (error) {
       console.error("Failed to create hotel:", error);
+    }
+  };
+
+  const handleEditClick = (hotel: Hotel) => {
+    setEditForm({
+      name: hotel.name,
+      address: hotel.address,
+      district: hotel.district,
+      province: hotel.province,
+      postalcode: hotel.postalcode,
+      tel: hotel.tel,
+      picture: hotel.picture,
+    });
+    setCurrentHotelId(hotel.id);
+    setIsEditing(true);
+  };
+
+  const handleDeleteClick = async (id: string) => {
+    if (confirm("Are you sure you want to delete this hotel?")) {
+      try {
+        await deleteHotel(id);
+        setHotels(hotels.filter((hotel) => hotel.id !== id));
+        alert("Hotel deleted successfully!");
+      } catch (error) {
+        console.error("Failed to delete hotel:", error);
+      }
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    if (!currentHotelId) return;
+
+    try {
+      await updateHotel(currentHotelId, editForm);
+      alert("Hotel updated successfully!");
+      setIsEditing(false);
+      // Refresh the hotel list
+      const updatedHotels = await fetchHotels();
+      setHotels(updatedHotels);
+    } catch (error) {
+      console.error("Failed to update hotel:", error);
     }
   };
 
   return (
     <div className="bg-black text-white min-h-screen">
       <TopMenu />
+      {isEditing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <h2 className="text-2xl font-bold mb-4">Edit Hotel</h2>
+            <label className="block mb-1">Hotel Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Hotel Name"
+              value={editForm.name}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">Address</label>
+            <input
+              type="text"
+              name="address"
+              placeholder="Address"
+              value={editForm.address}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">District</label>
+            <input
+              type="text"
+              name="district"
+              placeholder="District"
+              value={editForm.district}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">Province</label>
+            <input
+              type="text"
+              name="province"
+              placeholder="Province"
+              value={editForm.province}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">Postal Code</label>
+            <input
+              type="text"
+              name="postalcode"
+              placeholder="Postal Code"
+              value={editForm.postalcode}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">Tel</label>
+            <input
+              type="text"
+              name="tel"
+              placeholder="Tel"
+              value={editForm.tel}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <label className="block mb-1">Picture URL</label>
+            <input
+              type="text"
+              name="picture"
+              placeholder="Picture URL"
+              value={editForm.picture}
+              onChange={(e) => handleInputChange(e, "edit")}
+              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            />
+            <button
+              onClick={handleEditSubmit}
+              className="w-full p-3 bg-yellow-500 text-black font-semibold rounded hover:bg-yellow-600 transition-colors duration-300"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="w-full p-3 mt-4 bg-gray-700 text-white font-semibold rounded hover:bg-gray-800 transition-colors duration-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="p-8">
         <h1 className="text-4xl font-extrabold mb-8 text-center">
           Explore Our Hotels
@@ -65,13 +230,29 @@ export default function Home() {
           {hotels.map((hotel) => (
             <div
               key={hotel.id}
-              className="p-4 bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              className="p-4 bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative"
             >
               <h2 className="text-2xl font-semibold mb-2">{hotel.name}</h2>
               <p className="text-gray-300">Address: {hotel.address}</p>
               <p className="text-gray-300">District: {hotel.district}</p>
               <p className="text-gray-300">Province: {hotel.province}</p>
               <p className="text-gray-300">Tel: {hotel.tel}</p>
+              <div className="absolute top-2 right-2 flex space-x-2">
+                <button
+                  onClick={() => handleEditClick(hotel)}
+                  className="text-yellow-500 hover:text-yellow-600 focus:outline-none"
+                  aria-label="Edit Hotel"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(hotel.id)}
+                  className="text-red-500 hover:text-red-600 focus:outline-none"
+                  aria-label="Delete Hotel"
+                >
+                  <FaTrash />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -80,60 +261,67 @@ export default function Home() {
           Create a New Hotel
         </h1>
         <div className="max-w-lg mx-auto mt-4 p-6 bg-gray-900 rounded-lg shadow-lg">
+          <label className="block mb-1">Hotel Name</label>
           <input
             type="text"
             name="name"
             placeholder="Hotel Name"
-            value={form.name}
-            onChange={handleInputChange}
+            value={createForm.name}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">Address</label>
           <input
             type="text"
             name="address"
             placeholder="Address"
-            value={form.address}
-            onChange={handleInputChange}
+            value={createForm.address}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">District</label>
           <input
             type="text"
             name="district"
             placeholder="District"
-            value={form.district}
-            onChange={handleInputChange}
+            value={createForm.district}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">Province</label>
           <input
             type="text"
             name="province"
             placeholder="Province"
-            value={form.province}
-            onChange={handleInputChange}
+            value={createForm.province}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">Postal Code</label>
           <input
             type="text"
             name="postalcode"
             placeholder="Postal Code"
-            value={form.postalcode}
-            onChange={handleInputChange}
+            value={createForm.postalcode}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">Tel</label>
           <input
             type="text"
             name="tel"
             placeholder="Tel"
-            value={form.tel}
-            onChange={handleInputChange}
+            value={createForm.tel}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
+          <label className="block mb-1">Picture URL</label>
           <input
             type="text"
             name="picture"
             placeholder="Picture URL"
-            value={form.picture}
-            onChange={handleInputChange}
+            value={createForm.picture}
+            onChange={(e) => handleInputChange(e, "create")}
             className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
           />
           <button
