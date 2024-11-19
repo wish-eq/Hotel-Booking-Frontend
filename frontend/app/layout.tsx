@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import localFont from "next/font/local";
-import { authOptions } from "./api/auth /[...nextauth]/authOptions";
+import { authOptions } from "./api/auth /[...nextauth]/route";
 import "./globals.css";
 import NextAuthProvider from "./provider/NextAuthProvider";
 import { ThemeProvider } from "./ThemeProvider";
