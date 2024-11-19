@@ -10,6 +10,18 @@ import {
 } from "@/app/services/hotelService";
 import { Hotel } from "../interface";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { createBooking } from "@/app/services/bookingService";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs, { Dayjs } from "dayjs";
 
 interface FormState {
   name: string;
@@ -43,6 +55,12 @@ export default function Home() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentHotelId, setCurrentHotelId] = useState<string | null>(null);
+  const [isBooking, setIsBooking] = useState(false);
+
+  const [bookingDates, setBookingDates] = useState<{
+    bookingDate: Dayjs | null;
+    checkoutDate: Dayjs | null;
+  }>({ bookingDate: null, checkoutDate: null });
 
   useEffect(() => {
     async function getHotels() {
@@ -73,6 +91,60 @@ export default function Home() {
       setEditForm({ ...editForm, [name]: newValue });
     }
   };
+
+  const handleBookingClick = (hotelId: string) => {
+    setCurrentHotelId(hotelId);
+    setIsBooking(true);
+  };
+
+  const handleBookingSubmit = async () => {
+    if (
+      !currentHotelId ||
+      !bookingDates.bookingDate ||
+      !bookingDates.checkoutDate
+    ) {
+      alert("Please select valid dates.");
+      return;
+    }
+
+    if (bookingDates.checkoutDate.isBefore(bookingDates.bookingDate)) {
+      alert("Checkout date cannot be before the booking date.");
+      return;
+    }
+
+    const diffInDays = bookingDates.checkoutDate.diff(
+      bookingDates.bookingDate,
+      "day"
+    );
+    if (diffInDays > 3) {
+      alert("You can only book up to 3 nights.");
+      return;
+    }
+
+    try {
+      await createBooking(currentHotelId, {
+        bookingDate: bookingDates.bookingDate.format("YYYY-MM-DD"),
+        checkoutDate: bookingDates.checkoutDate.format("YYYY-MM-DD"),
+        createdAt: dayjs().format("YYYY-MM-DD"),
+      });
+      alert("Booking created successfully!");
+      setIsBooking(false);
+    } catch (error) {
+      console.error("Failed to create booking:", error);
+    }
+  };
+
+  useEffect(() => {
+    async function getHotels() {
+      try {
+        const data = await fetchHotels();
+        setHotels(data);
+      } catch (error) {
+        console.error("Failed to fetch hotels:", error);
+      }
+    }
+    getHotels();
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -139,6 +211,89 @@ export default function Home() {
   return (
     <div className="bg-black text-white min-h-screen">
       <TopMenu />
+      {isBooking && (
+        <Dialog open={isBooking} onClose={() => setIsBooking(false)}>
+          <DialogTitle>Book a Hotel</DialogTitle>
+          <DialogContent>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div className="mt-4">
+                <TextField
+                  label="Booking Date"
+                  value={
+                    bookingDates.bookingDate
+                      ? bookingDates.bookingDate.format("YYYY-MM-DD")
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const newBookingDate = dayjs(e.target.value);
+                    setBookingDates((prevDates) => ({
+                      ...prevDates,
+                      bookingDate: newBookingDate,
+                      checkoutDate:
+                        prevDates.checkoutDate &&
+                        newBookingDate.isAfter(prevDates.checkoutDate)
+                          ? newBookingDate.add(1, "day")
+                          : prevDates.checkoutDate,
+                    }));
+                  }}
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </div>
+              <div className="mt-4 w-[350px]">
+                <TextField
+                  label="Checkout Date"
+                  value={
+                    bookingDates.checkoutDate
+                      ? bookingDates.checkoutDate.format("YYYY-MM-DD")
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const newCheckoutDate = dayjs(e.target.value);
+                    setBookingDates((prevDates) => {
+                      if (newCheckoutDate.isBefore(prevDates.bookingDate)) {
+                        alert(
+                          "Checkout date cannot be before the booking date."
+                        );
+                        return prevDates;
+                      }
+                      return {
+                        ...prevDates,
+                        checkoutDate: newCheckoutDate,
+                      };
+                    });
+                  }}
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputProps={{
+                    inputProps: {
+                      min: bookingDates.bookingDate
+                        ? bookingDates.bookingDate.format("YYYY-MM-DD")
+                        : undefined,
+                    },
+                  }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </div>
+            </LocalizationProvider>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsBooking(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleBookingSubmit} color="primary">
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -253,6 +408,12 @@ export default function Home() {
                   <FaTrash />
                 </button>
               </div>
+              <button
+                onClick={() => handleBookingClick(hotel.id)}
+                className="mt-4 w-full p-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+              >
+                Book
+              </button>
             </div>
           ))}
         </div>

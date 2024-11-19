@@ -1,6 +1,7 @@
 
 import { Hotel, FormState } from "../interface";
 
+// user, admin
 export async function fetchHotels(): Promise<Hotel[]> {
   const response = await fetch("http://localhost:5000/api/v1/hotels");
   if (!response.ok) {
@@ -10,6 +11,7 @@ export async function fetchHotels(): Promise<Hotel[]> {
   return data.data || [];
 }
 
+// admin
 export async function createHotel(hotelData: FormState) {
   const response = await fetch("http://localhost:5000/api/v1/hotels", {
     method: "POST",
@@ -25,6 +27,7 @@ export async function createHotel(hotelData: FormState) {
   return await response.json();
 }
 
+// admin
 export async function updateHotel(id: string, hotelData: FormState) {
   const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
     method: "PUT",
@@ -40,6 +43,7 @@ export async function updateHotel(id: string, hotelData: FormState) {
   return await response.json();
 }
 
+// admin
 export async function deleteHotel(id: string) {
   const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
     method: "DELETE",

@@ -19,3 +19,24 @@ export interface FormState {
   tel: string;
   picture: string;
 }
+
+export interface BookingRequest {
+  bookingDate: string;
+  checkoutDate: string;
+  createdAt: string;
+}
+
+export interface Booking {
+  _id: string;
+  bookingDate: string;
+  checkoutDate: string;
+  user: string;
+  hotel: {
+    _id: string;
+    name: string;
+    address: string;
+    tel: string;
+    id: string;
+  };
+  createdAt: string;
+}
