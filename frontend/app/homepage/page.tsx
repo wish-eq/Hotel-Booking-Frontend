@@ -9,7 +9,7 @@ import {
   updateHotel,
 } from "@/app/services/hotelService";
 import { Hotel } from "../interface";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaSearch, FaTrash } from "react-icons/fa";
 import { createBooking } from "@/app/services/bookingService";
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
   TextField,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useTheme } from "../ThemeProvider";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -34,6 +35,7 @@ interface FormState {
 }
 
 export default function Home() {
+  const { isDarkMode } = useTheme();
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [createForm, setCreateForm] = useState<FormState>({
     name: "",
@@ -56,6 +58,11 @@ export default function Home() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentHotelId, setCurrentHotelId] = useState<string | null>(null);
   const [isBooking, setIsBooking] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   const [bookingDates, setBookingDates] = useState<{
     bookingDate: Dayjs | null;
@@ -209,11 +216,31 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div
+      className={`min-h-screen ${
+        isDarkMode ? "bg-black text-white" : "bg-white text-black"
+      } transition-colors duration-300`}
+    >
+      {" "}
       <TopMenu />
       {isBooking && (
-        <Dialog open={isBooking} onClose={() => setIsBooking(false)}>
-          <DialogTitle>Book a Hotel</DialogTitle>
+        <Dialog
+          open={isBooking}
+          onClose={() => setIsBooking(false)}
+          PaperProps={{
+            style: {
+              backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+              color: isDarkMode ? "#ffffff" : "#000000",
+            },
+          }}
+        >
+          <DialogTitle
+            className={`${
+              isDarkMode ? "text-white" : "text-black"
+            } font-bold text-xl`}
+          >
+            Book a Hotel
+          </DialogTitle>
           <DialogContent>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <div className="mt-4">
@@ -241,6 +268,15 @@ export default function Home() {
                   variant="outlined"
                   InputLabelProps={{
                     shrink: true,
+                    style: {
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
+                  InputProps={{
+                    style: {
+                      backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
                   }}
                 />
               </div>
@@ -270,25 +306,43 @@ export default function Home() {
                   type="date"
                   fullWidth
                   variant="outlined"
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
                   InputProps={{
                     inputProps: {
                       min: bookingDates.bookingDate
                         ? bookingDates.bookingDate.format("YYYY-MM-DD")
                         : undefined,
                     },
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
+                    style: {
+                      backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
                   }}
                 />
               </div>
             </LocalizationProvider>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setIsBooking(false)} color="secondary">
+            <Button
+              onClick={() => setIsBooking(false)}
+              style={{
+                color: isDarkMode ? "#9ca3af" : "#000000",
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={handleBookingSubmit} color="primary">
+            <Button
+              onClick={handleBookingSubmit}
+              style={{
+                color: isDarkMode ? "#ffffff" : "#ffffff",
+                backgroundColor: isDarkMode ? "#2563eb" : "#3b82f6",
+              }}
+            >
               Submit
             </Button>
           </DialogActions>
@@ -296,8 +350,18 @@ export default function Home() {
       )}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-bold mb-4">Edit Hotel</h2>
+          <div
+            className={`p-6 rounded-lg shadow-lg w-full max-w-lg ${
+              isDarkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+            }`}
+          >
+            <h2
+              className={`text-2xl font-bold mb-4 ${
+                isDarkMode ? "text-white" : "text-black"
+              }`}
+            >
+              Edit Hotel
+            </h2>
             <label className="block mb-1">Hotel Name</label>
             <input
               type="text"
@@ -305,7 +369,11 @@ export default function Home() {
               placeholder="Hotel Name"
               value={editForm.name}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">Address</label>
             <input
@@ -314,7 +382,11 @@ export default function Home() {
               placeholder="Address"
               value={editForm.address}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">District</label>
             <input
@@ -323,7 +395,11 @@ export default function Home() {
               placeholder="District"
               value={editForm.district}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">Province</label>
             <input
@@ -332,7 +408,11 @@ export default function Home() {
               placeholder="Province"
               value={editForm.province}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">Postal Code</label>
             <input
@@ -341,7 +421,11 @@ export default function Home() {
               placeholder="Postal Code"
               value={editForm.postalcode}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">Tel</label>
             <input
@@ -350,7 +434,11 @@ export default function Home() {
               placeholder="Tel"
               value={editForm.tel}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <label className="block mb-1">Picture URL</label>
             <input
@@ -359,69 +447,166 @@ export default function Home() {
               placeholder="Picture URL"
               value={editForm.picture}
               onChange={(e) => handleInputChange(e, "edit")}
-              className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-600 text-white"
+                  : "bg-gray-100 border-gray-300 text-black"
+              }`}
             />
             <button
               onClick={handleEditSubmit}
-              className="w-full p-3 bg-yellow-500 text-black font-semibold rounded hover:bg-yellow-600 transition-colors duration-300"
+              className={`w-full p-3 font-semibold rounded hover:bg-yellow-600 transition-colors duration-300 ${
+                isDarkMode ? "bg-blue-500 text-white" : "bg-blue-500 text-white"
+              }`}
             >
               Save Changes
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="w-full p-3 mt-4 bg-gray-700 text-white font-semibold rounded hover:bg-gray-800 transition-colors duration-300"
+              className={`w-full p-3 mt-4 font-semibold rounded transition-colors duration-300 ${
+                isDarkMode
+                  ? "bg-gray-700 hover:bg-gray-800 text-white"
+                  : "bg-gray-300 hover:bg-gray-400 text-black"
+              }`}
             >
               Cancel
             </button>
           </div>
         </div>
       )}
-
       <div className="p-8">
         <h1 className="text-4xl font-extrabold mb-8 text-center">
           Explore Our Hotels
         </h1>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {hotels.map((hotel) => (
-            <div
-              key={hotel.id}
-              className="p-4 bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative"
-            >
-              <h2 className="text-2xl font-semibold mb-2">{hotel.name}</h2>
-              <p className="text-gray-300">Address: {hotel.address}</p>
-              <p className="text-gray-300">District: {hotel.district}</p>
-              <p className="text-gray-300">Province: {hotel.province}</p>
-              <p className="text-gray-300">Tel: {hotel.tel}</p>
-              <div className="absolute top-2 right-2 flex space-x-2">
-                <button
-                  onClick={() => handleEditClick(hotel)}
-                  className="text-yellow-500 hover:text-yellow-600 focus:outline-none"
-                  aria-label="Edit Hotel"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(hotel.id)}
-                  className="text-red-500 hover:text-red-600 focus:outline-none"
-                  aria-label="Delete Hotel"
-                >
-                  <FaTrash />
-                </button>
-              </div>
-              <button
-                onClick={() => handleBookingClick(hotel.id)}
-                className="mt-4 w-full p-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
-              >
-                Book
-              </button>
-            </div>
-          ))}
+        <div className="max-w-lg mx-auto mb-8">
+          <div
+            className={`flex items-center border rounded-lg p-2 ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
+          >
+            <input
+              type="text"
+              placeholder="Search hotels..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className={`flex-grow bg-transparent outline-none px-2 ${
+                isDarkMode ? "text-white" : "text-black"
+              }`}
+            />
+            <FaSearch
+            // className={`${isDarkMode ? "text-white" : "text-black"}`}
+            />
+          </div>
         </div>
 
-        <h1 className="text-3xl font-bold mt-16 text-center">
+        <div className="flex flex-wrap -mx-4">
+          {hotels
+            .filter((hotel) =>
+              hotel.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((hotel) => (
+              <div
+                key={hotel.id}
+                className="w-full md:w-1/2 lg:w-1/3 px-4 mb-8"
+              >
+                <div
+                  className={`shadow-lg relative rounded-lg overflow-hidden ${
+                    isDarkMode
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                >
+                  <img
+                    src="https://picsum.photos/1280/720/?hotel%20lobby"
+                    alt={`${hotel.name} Image`}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                  <div className="p-4">
+                    <h2
+                      className={`text-2xl font-semibold mb-2 ${
+                        isDarkMode ? "text-white" : "text-black"
+                      }`}
+                    >
+                      {hotel.name}
+                    </h2>
+                    <p
+                      className={`${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      Address: {hotel.address}
+                    </p>
+                    <p
+                      className={`${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      District: {hotel.district}
+                    </p>
+                    <p
+                      className={`${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      Province: {hotel.province}
+                    </p>
+                    <p
+                      className={`${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      Tel: {hotel.tel}
+                    </p>
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <button
+                        onClick={() => handleEditClick(hotel)}
+                        className={`p-2 rounded-full focus:outline-none ${
+                          isDarkMode
+                            ? "bg-yellow-700 hover:bg-yellow-600 text-white"
+                            : "bg-yellow-300 hover:bg-yellow-400 text-black"
+                        }`}
+                        aria-label="Edit Hotel"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(hotel.id)}
+                        className={`p-2 rounded-full focus:outline-none ${
+                          isDarkMode
+                            ? "bg-red-700 hover:bg-red-600 text-white"
+                            : "bg-red-300 hover:bg-red-400 text-black"
+                        }`}
+                        aria-label="Delete Hotel"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleBookingClick(hotel.id)}
+                      className="mt-4 w-full p-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+                    >
+                      Book
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <h1
+          className={`text-3xl font-bold mt-16 text-center ${
+            isDarkMode ? "text-white" : "text-black"
+          }`}
+        >
           Create a New Hotel
         </h1>
-        <div className="max-w-lg mx-auto mt-4 p-6 bg-gray-900 rounded-lg shadow-lg">
+        <div
+          className={`max-w-lg mx-auto mt-4 p-6 rounded-lg shadow-lg ${
+            isDarkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+          }`}
+        >
           <label className="block mb-1">Hotel Name</label>
           <input
             type="text"
@@ -429,7 +614,11 @@ export default function Home() {
             placeholder="Hotel Name"
             value={createForm.name}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">Address</label>
           <input
@@ -438,7 +627,11 @@ export default function Home() {
             placeholder="Address"
             value={createForm.address}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">District</label>
           <input
@@ -447,7 +640,11 @@ export default function Home() {
             placeholder="District"
             value={createForm.district}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">Province</label>
           <input
@@ -456,7 +653,11 @@ export default function Home() {
             placeholder="Province"
             value={createForm.province}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">Postal Code</label>
           <input
@@ -465,7 +666,11 @@ export default function Home() {
             placeholder="Postal Code"
             value={createForm.postalcode}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">Tel</label>
           <input
@@ -474,7 +679,11 @@ export default function Home() {
             placeholder="Tel"
             value={createForm.tel}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <label className="block mb-1">Picture URL</label>
           <input
@@ -483,11 +692,17 @@ export default function Home() {
             placeholder="Picture URL"
             value={createForm.picture}
             onChange={(e) => handleInputChange(e, "create")}
-            className="block w-full p-3 mb-4 bg-gray-800 border border-gray-600 rounded focus:ring focus:ring-yellow-500 outline-none"
+            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-600 text-white"
+                : "bg-gray-100 border-gray-300 text-black"
+            }`}
           />
           <button
             onClick={handleSubmit}
-            className="w-full p-3 bg-yellow-500 text-black font-semibold rounded hover:bg-yellow-600 transition-colors duration-300"
+            className={`w-full p-3 font-semibold rounded hover:bg-yellow-600 transition-colors duration-300 ${
+              isDarkMode ? "bg-blue-500 text-white" : "bg-blue-500 text-white"
+            }`}
           >
             Create New Hotel
           </button>

@@ -20,12 +20,15 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+
 import { format } from "date-fns";
 import TopMenu from "../components/TopMenu";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import dayjs, { Dayjs } from "dayjs";
+import { useTheme } from "../ThemeProvider";
 
 export default function MyBookings() {
+  const { isDarkMode } = useTheme();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +42,7 @@ export default function MyBookings() {
   useEffect(() => {
     async function getBookings() {
       try {
-        const data = await fetchUserBookings(); // Fetches the data using API
+        const data = await fetchUserBookings();
         setBookings(data);
       } catch (err) {
         console.error("Failed to fetch bookings:", err);
@@ -61,7 +64,6 @@ export default function MyBookings() {
         ? bookingDate.add(1, "day")
         : checkoutDate,
     });
-
     setIsEditing(true);
   };
 
@@ -93,7 +95,6 @@ export default function MyBookings() {
       });
       alert("Booking updated successfully!");
       setIsEditing(false);
-      // Refresh the bookings list
       const updatedBookings = await fetchUserBookings();
       setBookings(updatedBookings);
     } catch (error) {
@@ -132,143 +133,215 @@ export default function MyBookings() {
   }
 
   return (
-    <div className="p-8 bg-black text-white min-h-screen">
-      <TopMenu />
-
-      <Typography variant="h4" align="center" gutterBottom>
-        My Bookings
-      </Typography>
-      {bookings.length === 0 ? (
-        <Typography align="center">No bookings found.</Typography>
-      ) : (
-        <Grid container spacing={4}>
-          {bookings.map((booking) => (
-            <Grid item xs={12} md={6} lg={4} key={booking._id}>
-              <Card className="bg-gray-800 text-white shadow-lg relative">
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {booking.hotel.name}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Address: {booking.hotel.address}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Tel: {booking.hotel.tel}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Booking Date:{" "}
-                    {format(new Date(booking.bookingDate), "dd MMM yyyy")}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    Checkout Date:{" "}
-                    {format(new Date(booking.checkoutDate), "dd MMM yyyy")}
-                  </Typography>
-                  <Typography variant="caption" display="block" gutterBottom>
-                    Created At:{" "}
-                    {format(new Date(booking.createdAt), "dd MMM yyyy")}
-                  </Typography>
-                  <div className="absolute top-2 right-2 flex space-x-2">
-                    <button
-                      onClick={() => handleEditClick(booking)}
-                      className="text-yellow-500 hover:text-yellow-600 focus:outline-none"
-                      aria-label="Edit Booking"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(booking._id)}
-                      className="text-red-500 hover:text-red-600 focus:outline-none"
-                      aria-label="Delete Booking"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-      {isEditing && currentBooking && (
-        <Dialog open={isEditing} onClose={() => setIsEditing(false)}>
-          <DialogTitle>Edit Booking</DialogTitle>
-          <DialogContent>
-            <div className="mt-4 w-[350px]">
-              <TextField
-                label="Booking Date"
-                value={
-                  editDates.bookingDate
-                    ? editDates.bookingDate.format("YYYY-MM-DD")
-                    : ""
-                }
-                onChange={(e) => {
-                  const newBookingDate = dayjs(e.target.value);
-                  setEditDates((prevDates) => ({
-                    ...prevDates,
-                    bookingDate: newBookingDate,
-                    checkoutDate:
-                      prevDates.checkoutDate &&
-                      newBookingDate.isAfter(prevDates.checkoutDate)
-                        ? newBookingDate.add(1, "day")
-                        : prevDates.checkoutDate,
-                  }));
-                }}
-                type="date"
-                fullWidth
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </div>
-            <div className="mt-4">
-              <TextField
-                label="Checkout Date"
-                value={
-                  editDates.checkoutDate
-                    ? editDates.checkoutDate.format("YYYY-MM-DD")
-                    : ""
-                }
-                onChange={(e) => {
-                  const newCheckoutDate = dayjs(e.target.value);
-                  setEditDates((prevDates) => {
-                    if (newCheckoutDate.isBefore(prevDates.bookingDate)) {
-                      alert("Checkout date cannot be before the booking date.");
-                      return prevDates;
-                    }
-                    return {
-                      ...prevDates,
-                      checkoutDate: newCheckoutDate,
-                    };
-                  });
-                }}
-                type="date"
-                fullWidth
-                variant="outlined"
-                InputProps={{
-                  inputProps: {
-                    min: editDates.bookingDate
+    <div
+      className={`min-h-screen ${
+        isDarkMode ? "bg-black text-white" : "bg-white text-black"
+      } transition-colors duration-300`}
+    >
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <TopMenu />
+      </div>
+      <div className="pt-20 p-8">
+        <Typography variant="h4" align="center" gutterBottom>
+          My Bookings
+        </Typography>
+        {bookings.length === 0 ? (
+          <Typography align="center">No bookings found.</Typography>
+        ) : (
+          <div className="flex flex-wrap -mx-4">
+            {bookings.map((booking) => (
+              <div
+                key={booking._id}
+                className="w-full md:w-1/2 lg:w-1/3 px-4 mb-8"
+              >
+                <div
+                  className={`shadow-lg relative rounded-lg overflow-hidden ${
+                    isDarkMode
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                >
+                  <img
+                    src="https://picsum.photos/1280/720/?hotel%20room"
+                    alt={`${booking.hotel.name} Image`}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {booking.hotel.name}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Address: {booking.hotel.address}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Tel: {booking.hotel.tel}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Booking Date:{" "}
+                      {format(new Date(booking.bookingDate), "dd MMM yyyy")}
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Checkout Date:{" "}
+                      {format(new Date(booking.checkoutDate), "dd MMM yyyy")}
+                    </Typography>
+                    <Typography variant="caption" display="block" gutterBottom>
+                      Created At:{" "}
+                      {format(new Date(booking.createdAt), "dd MMM yyyy")}
+                    </Typography>
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <button
+                        onClick={() => handleEditClick(booking)}
+                        className={`p-2 rounded-full focus:outline-none ${
+                          isDarkMode
+                            ? "bg-yellow-700 hover:bg-yellow-600 text-white"
+                            : "bg-yellow-300 hover:bg-yellow-400 text-black"
+                        }`}
+                        aria-label="Edit Booking"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(booking._id)}
+                        className={`p-2 rounded-full focus:outline-none ${
+                          isDarkMode
+                            ? "bg-red-700 hover:bg-red-600 text-white"
+                            : "bg-red-300 hover:bg-red-400 text-black"
+                        }`}
+                        aria-label="Delete Booking"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </CardContent>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {isEditing && currentBooking && (
+          <Dialog
+            open={isEditing}
+            onClose={() => setIsEditing(false)}
+            PaperProps={{
+              style: {
+                backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                color: isDarkMode ? "#ffffff" : "#000000",
+              },
+            }}
+          >
+            <DialogTitle
+              className={`${
+                isDarkMode ? "text-white" : "text-black"
+              } font-bold text-xl`}
+            >
+              Edit Booking
+            </DialogTitle>
+            <DialogContent>
+              <div className="mt-4 w-[350px]">
+                <TextField
+                  label="Booking Date"
+                  value={
+                    editDates.bookingDate
                       ? editDates.bookingDate.format("YYYY-MM-DD")
-                      : undefined,
-                  },
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const newBookingDate = dayjs(e.target.value);
+                    setEditDates((prevDates) => ({
+                      ...prevDates,
+                      bookingDate: newBookingDate,
+                      checkoutDate:
+                        prevDates.checkoutDate &&
+                        newBookingDate.isAfter(prevDates.checkoutDate)
+                          ? newBookingDate.add(1, "day")
+                          : prevDates.checkoutDate,
+                    }));
+                  }}
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
+                  InputProps={{
+                    style: {
+                      backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
+                />
+              </div>
+              <div className="mt-4">
+                <TextField
+                  label="Checkout Date"
+                  value={
+                    editDates.checkoutDate
+                      ? editDates.checkoutDate.format("YYYY-MM-DD")
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const newCheckoutDate = dayjs(e.target.value);
+                    setEditDates((prevDates) => {
+                      if (newCheckoutDate.isBefore(prevDates.bookingDate)) {
+                        alert(
+                          "Checkout date cannot be before the booking date."
+                        );
+                        return prevDates;
+                      }
+                      return {
+                        ...prevDates,
+                        checkoutDate: newCheckoutDate,
+                      };
+                    });
+                  }}
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputProps={{
+                    inputProps: {
+                      min: editDates.bookingDate
+                        ? editDates.bookingDate.format("YYYY-MM-DD")
+                        : undefined,
+                    },
+                    style: {
+                      backgroundColor: isDarkMode ? "#374151" : "#f9fafb",
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
+                  InputLabelProps={{
+                    shrink: true,
+                    style: {
+                      color: isDarkMode ? "#ffffff" : "#000000",
+                    },
+                  }}
+                />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setIsEditing(false)}
+                style={{
+                  color: isDarkMode ? "#9ca3af" : "#000000",
                 }}
-                InputLabelProps={{
-                  shrink: true,
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleEditSubmit}
+                style={{
+                  color: isDarkMode ? "#ffffff" : "#000000",
+                  backgroundColor: isDarkMode ? "#2563eb" : "#3b82f6",
                 }}
-              />
-            </div>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIsEditing(false)} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={handleEditSubmit} color="primary">
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+              >
+                Submit
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+      </div>
     </div>
   );
 }
