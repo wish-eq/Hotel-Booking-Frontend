@@ -362,100 +362,116 @@ export default function Home() {
             >
               Edit Hotel
             </h2>
-            <label className="block mb-1">Hotel Name</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Hotel Name"
-              value={editForm.name}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">Address</label>
-            <input
-              type="text"
-              name="address"
-              placeholder="Address"
-              value={editForm.address}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">District</label>
-            <input
-              type="text"
-              name="district"
-              placeholder="District"
-              value={editForm.district}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">Province</label>
-            <input
-              type="text"
-              name="province"
-              placeholder="Province"
-              value={editForm.province}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">Postal Code</label>
-            <input
-              type="text"
-              name="postalcode"
-              placeholder="Postal Code"
-              value={editForm.postalcode}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">Tel</label>
-            <input
-              type="text"
-              name="tel"
-              placeholder="Tel"
-              value={editForm.tel}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
-            <label className="block mb-1">Picture URL</label>
-            <input
-              type="text"
-              name="picture"
-              placeholder="Picture URL"
-              value={editForm.picture}
-              onChange={(e) => handleInputChange(e, "edit")}
-              className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-600 text-white"
-                  : "bg-gray-100 border-gray-300 text-black"
-              }`}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1">Hotel Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Hotel Name"
+                  value={editForm.name}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Address"
+                  value={editForm.address}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">District</label>
+                <input
+                  type="text"
+                  name="district"
+                  placeholder="District"
+                  value={editForm.district}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Province</label>
+                <input
+                  type="text"
+                  name="province"
+                  placeholder="Province"
+                  value={editForm.province}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Postal Code</label>
+                <input
+                  type="text"
+                  name="postalcode"
+                  placeholder="Postal Code"
+                  value={editForm.postalcode}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Tel</label>
+                <input
+                  type="text"
+                  name="tel"
+                  placeholder="Tel"
+                  value={editForm.tel}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block mb-1">Picture URL</label>
+                <input
+                  type="text"
+                  name="picture"
+                  placeholder="Picture URL"
+                  value={editForm.picture}
+                  onChange={(e) => handleInputChange(e, "edit")}
+                  className={`block w-full p-3 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-gray-100 border-gray-300 text-black"
+                  }`}
+                />
+              </div>
+            </div>
             <button
               onClick={handleEditSubmit}
-              className={`w-full p-3 font-semibold rounded hover:bg-yellow-600 transition-colors duration-300 ${
+              className={`w-full p-3 mt-4 font-semibold rounded hover:bg-blue-600 transition-colors duration-300 ${
                 isDarkMode ? "bg-blue-500 text-white" : "bg-blue-500 text-white"
               }`}
             >
@@ -700,7 +716,7 @@ export default function Home() {
           />
           <button
             onClick={handleSubmit}
-            className={`w-full p-3 font-semibold rounded hover:bg-yellow-600 transition-colors duration-300 ${
+            className={`w-full p-3 font-semibold rounded hover:bg-blue-600 transition-colors duration-300 ${
               isDarkMode ? "bg-blue-500 text-white" : "bg-blue-500 text-white"
             }`}
           >
