@@ -5,6 +5,8 @@ import TopMenu from "@/app/components/TopMenu";
 import { fetchHotels, createHotel } from "@/app/services/hotelService";
 import { Hotel } from "./interface";
 import { ThemeProvider } from "./ThemeProvider";
+import HomePage from "@/app/components/HomePage";
+
 
 interface FormState {
   name: string;
@@ -59,6 +61,7 @@ export default function Home() {
     <ThemeProvider>
       <div className="bg-black text-white min-h-screen">
         <TopMenu />
+        <HomePage />
         <div className="p-8">
           <h1 className="text-4xl font-extrabold mb-8 text-center">
             Explore Our Hotels
