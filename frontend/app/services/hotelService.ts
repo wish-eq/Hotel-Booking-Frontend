@@ -1,9 +1,12 @@
 import { Hotel, FormState } from "../interface";
 import { getSession } from "@/app/utils/session";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+
 // user, admin
 export async function fetchHotels(): Promise<Hotel[]> {
-  const response = await fetch("http://localhost:5000/api/v1/hotels");
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels`);
   if (!response.ok) {
     throw new Error("Failed to fetch hotels");
   }
@@ -18,7 +21,7 @@ export async function createHotel(hotelData: FormState) {
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch("http://localhost:5000/api/v1/hotels", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,7 +44,7 @@ export async function updateHotel(id: string, hotelData: FormState) {
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -64,7 +67,7 @@ export async function deleteHotel(id: string) {
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${session.token}`, // Use token from session

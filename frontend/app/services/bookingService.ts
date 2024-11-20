@@ -1,13 +1,16 @@
 import { BookingRequest } from "../interface";
 import { getSession } from "@/app/utils/session";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+
 export async function fetchUserBookings() {
   const session = getSession(); // Retrieve session
   if (!session || !session.token) {
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch("http://localhost:5000/api/v1/bookings", {
+const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/bookings`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +32,7 @@ export async function createBooking(hotelId: string, bookingData: BookingRequest
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch(`http://localhost:5000/api/v1/hotels/${hotelId}/bookings`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels/${hotelId}/bookings`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -51,7 +54,7 @@ export async function updateBooking(bookingId: string, bookingData: BookingReque
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch(`http://localhost:5000/api/v1/bookings/${bookingId}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/bookings/${bookingId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -73,7 +76,7 @@ export async function deleteBooking(bookingId: string) {
     throw new Error("No token found. Please log in.");
   }
 
-  const response = await fetch(`http://localhost:5000/api/v1/bookings/${bookingId}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/bookings/${bookingId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${session.token}`, // Use token from session

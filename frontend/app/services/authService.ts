@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { getSession } from '@/app/utils/session';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+
 export const login = async (email: string, password: string) => {
     try {
-        const response = await axios.post('http://localhost:5000/api/v1/auth/login', { email, password });
+        const response = await axios.post(`${BACKEND_URL}/api/v1/auth/login`, { email, password });
         if (response.data.success) {
             return response.data;
         }
@@ -20,7 +23,7 @@ export const getUserInfo = async () => {
             throw new Error('No token found. Please log in.');
         }
 
-        const response = await axios.get('http://localhost:5000/api/v1/auth/me', {
+        const response = await axios.get(`${BACKEND_URL}/api/v1/auth/me`, {
             headers: {
                 Authorization: `Bearer ${session.token}`,
             },
