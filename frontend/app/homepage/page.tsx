@@ -4,6 +4,7 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { getSession, clearSession } from "@/app/utils/session";
 import TopMenu from "@/app/components/TopMenu";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import {
   fetchHotels,
@@ -582,7 +583,7 @@ export default function Home() {
                       : "bg-gray-200 text-black"
                   }`}
                 >
-                  <img
+                  <Image
                     src="https://picsum.photos/1280/720/?hotel%20lobby"
                     alt={`${hotel.name} Image`}
                     className="w-full h-48 object-cover rounded-t-lg mb-4"

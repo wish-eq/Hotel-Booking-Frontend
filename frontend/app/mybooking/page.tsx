@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation"; // Already imported in your file
 import { getSession } from "@/app/utils/session"; // Import session utility
 import {
@@ -171,7 +172,7 @@ export default function MyBookings() {
                       : "bg-gray-200 text-black"
                   }`}
                 >
-                  <img
+                  <Image
                     src="https://picsum.photos/1280/720/?hotel%20room"
                     alt={`${booking.hotel.name} Image`}
                     className="w-full h-48 object-cover rounded-t-lg mb-4"

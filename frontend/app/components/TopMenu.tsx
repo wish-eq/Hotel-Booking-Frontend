@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { clearSession } from "@/app/utils/session";
 import { useEffect, useState } from "react";
 import { getUserInfo } from "@/app/services/authService";
+import Image from "next/image";
 
 export default function TopMenu() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -64,7 +65,7 @@ export default function TopMenu() {
       {/* User Information */}
       {userInfo && (
         <div className="flex items-center space-x-2">
-          <img
+          <Image
             src={`https://picsum.photos/seed/${userInfo._id}/50`} // Dynamic image seed
             alt="User Profile"
             className="w-10 h-10 rounded-full border border-gray-300"
