@@ -20,7 +20,7 @@ export default function TopMenuPanel({ role, sessionUser }: { role: string, sess
                     height={1000}
                 />
                 <div className="flex flex-row justify-around w-[40%]">
-                    <TopMenuItem pageRef="/" title="Home" />
+                    <TopMenuItem pageRef="/homepage" title="Home" />
                     <TopMenuItem pageRef="/mybooking" title="My Booking" />
                     <TopMenuItem pageRef="/information" title="Information" />
                     {role == "admin" ? (
@@ -28,7 +28,6 @@ export default function TopMenuPanel({ role, sessionUser }: { role: string, sess
                     ) : null}
                 </div>
                 <div className="lg:w-[25%] md:w-[15%] sm:w-[7%] w-[0%]"></div>
-                <TopMenuItem pageRef="/profile" title="Profile" />
                 <div className="pr-[40px]"></div>
                 <div className="flex items-center">
                     {sessionUser ? (

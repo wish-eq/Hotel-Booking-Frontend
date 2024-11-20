@@ -10,7 +10,7 @@ export default function SignOut() {
         const session = await getSession();
         if (session) {
             await signOut({ redirect: false });
-            router.push('/auth/login');
+            router.push('/');
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
