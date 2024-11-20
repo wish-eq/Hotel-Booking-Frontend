@@ -13,7 +13,7 @@ interface UserInfo {
     role: string;
     name: string;
     email: string;
-    [key: string]: any; // If there are other unknown fields
+    // [key: string]: any; // If there are other unknown fields
   };
 }
 

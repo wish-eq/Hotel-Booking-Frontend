@@ -11,9 +11,9 @@ export const login = async (email: string, password: string) => {
             return response.data;
         }
         throw new Error('Login failed');
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'An error occurred');
-    }
+    }  catch (err) {
+        console.error(err); // Logs the error for debugging purposes
+      }
 };
 
 export const getUserInfo = async () => {
@@ -30,7 +30,7 @@ export const getUserInfo = async () => {
         });
 
         return response.data; // Return user information
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Failed to fetch user info');
-    }
+    } catch (err) {
+        console.error(err); // Logs the error for debugging purposes
+      }
 };

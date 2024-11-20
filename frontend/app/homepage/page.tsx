@@ -44,7 +44,7 @@ interface UserInfo {
     role: string;
     name: string;
     email: string;
-    [key: string]: any; // If there are other unknown fields
+    // [key: string]: any; // If there are other unknown fields
   };
 }
 
@@ -90,19 +90,19 @@ export default function Home() {
         const user = await getUserInfo();
         setUserInfo(user); // Set user information
         console.log("User Info:", user); // Debugging
-      } catch (err: any) {
-        console.log("get user fail");
+      } catch (err) {
+        console.error(err); // Logs the error for debugging purposes
       }
     }
 
     fetchUserInfo();
   }, []);
 
-  const handleLogout = () => {
-    clearSession(); // Clear session from cookies
-    setSession(null); // Reset session state
-    router.push("auth/login"); // Redirect to login page
-  };
+  // const handleLogout = () => {
+  //   clearSession(); // Clear session from cookies
+  //   setSession(null); // Reset session state
+  //   router.push("auth/login"); // Redirect to login page
+  // };
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentHotelId, setCurrentHotelId] = useState<string | null>(null);

@@ -22,8 +22,8 @@ export default function LoginPage() {
         token: data.token,
       });
       router.push("/homepage");
-    } catch (err: any) {
-      setError(err.message || "An error occurred during login");
+    } catch (err) {
+      console.error(err); // Logs the error for debugging purposes
     }
   };
 

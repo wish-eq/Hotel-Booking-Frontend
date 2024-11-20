@@ -36,8 +36,8 @@ export default function RegisterPage() {
 
       alert("Registration successful!");
       router.push("/auth/login");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      console.error(err); // Logs the error for debugging purposes
     }
   };
 

@@ -11,11 +11,9 @@ import {
 } from "@/app/services/bookingService";
 import { Booking } from "../interface";
 import {
-  Card,
   CardContent,
   Typography,
   CircularProgress,
-  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
