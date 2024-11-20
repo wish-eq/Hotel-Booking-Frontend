@@ -8,11 +8,20 @@ import { useEffect, useState } from "react";
 import { getUserInfo } from "@/app/services/authService";
 import Image from "next/image";
 
+interface UserInfo {
+  data: {
+    role: string;
+    name: string;
+    email: string;
+    [key: string]: any; // If there are other unknown fields
+  };
+}
+
 export default function TopMenu() {
   const { isDarkMode, toggleTheme } = useTheme();
   const router = useRouter();
 
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -66,7 +75,7 @@ export default function TopMenu() {
       {userInfo && (
         <div className="flex items-center space-x-2">
           <Image
-            src={`https://picsum.photos/seed/${userInfo._id}/50`} // Dynamic image seed
+            src={`https://picsum.photos/seed/${userInfo.data.name}/50`} // Dynamic image seed
             alt="User Profile"
             className="w-10 h-10 rounded-full border border-gray-300"
           />

@@ -21,7 +21,7 @@ export default function LoginPage() {
         email: data.email,
         token: data.token,
       });
-      router.push("/homepage"); // Redirect to the home page or any other page after login
+      router.push("/homepage");
     } catch (err: any) {
       setError(err.message || "An error occurred during login");
     }
