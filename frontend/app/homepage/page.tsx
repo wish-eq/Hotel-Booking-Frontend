@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, ChangeEvent } from "react";
-import { getSession, clearSession } from "@/app/utils/session";
+import { getSession } from "@/app/utils/session";
 import TopMenu from "@/app/components/TopMenu";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -39,6 +39,13 @@ interface FormState {
   picture: string;
 }
 
+interface Session {
+  _id: string;
+  name: string;
+  email: string;
+  token: string;
+}
+
 interface UserInfo {
   data: {
     role: string;
@@ -71,7 +78,7 @@ export default function Home() {
     tel: "",
     picture: "",
   });
-  const [session, setSession] = useState<any>(null); // Add state to track session
+  const [session, setSession] = useState<Session | null>(null); // Add state to track session
   const router = useRouter();
 
   useEffect(() => {

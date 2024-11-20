@@ -11,7 +11,7 @@ export default function RegisterPage() {
     password: "",
     role: "user",
   });
-  const [error, setError] = useState("");
+  const [error] = useState("");
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
