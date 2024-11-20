@@ -3,14 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+interface FormData {
+  name: string;
+  email: string;
+  tel: string;
+  password: string;
+  role: string;
+}
+
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     tel: "",
     password: "",
     role: "user",
   });
+
   const [error] = useState("");
   const router = useRouter();
 
@@ -64,7 +73,7 @@ export default function RegisterPage() {
                 type={key === "password" ? "password" : "text"}
                 name={key}
                 placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-                value={(formData as any)[key]}
+                value={formData[key as keyof FormData]}
                 onChange={handleChange}
                 className="bg-gray-700 text-white shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500"
               />
