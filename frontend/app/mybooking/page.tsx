@@ -55,7 +55,7 @@ export default function MyBookings() {
         const data = await fetchUserBookings();
         setBookings(data);
       } catch (err) {
-        // console.error("Failed to fetch bookings:", err);
+        console.error("Failed to fetch bookings:", err);
         setError("Failed to fetch bookings.");
       } finally {
         setLoading(false);
@@ -108,7 +108,7 @@ export default function MyBookings() {
       const updatedBookings = await fetchUserBookings();
       setBookings(updatedBookings);
     } catch (error) {
-      // console.error("Failed to update booking:", error);
+      console.error("Failed to update booking:", error);
     }
   };
 
@@ -119,7 +119,7 @@ export default function MyBookings() {
         setBookings(bookings.filter((booking) => booking._id !== bookingId));
         alert("Booking deleted successfully!");
       } catch (error) {
-        // console.error("Failed to delete booking:", error);
+        console.error("Failed to delete booking:", error);
       }
     }
   };

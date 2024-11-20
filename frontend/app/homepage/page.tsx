@@ -123,7 +123,7 @@ export default function Home() {
         const data = await fetchHotels();
         setHotels(data);
       } catch (error) {
-        // console.error("Failed to fetch hotels:", error);
+        console.error("Failed to fetch hotels:", error);
       }
     }
     getHotels();
@@ -185,7 +185,7 @@ export default function Home() {
       alert("Booking created successfully!");
       setIsBooking(false);
     } catch (error) {
-      // console.error("Failed to create booking:", error);
+      console.error("Failed to create booking:", error);
     }
   };
 
@@ -195,7 +195,7 @@ export default function Home() {
         const data = await fetchHotels();
         setHotels(data);
       } catch (error) {
-        // console.error("Failed to fetch hotels:", error);
+        console.error("Failed to fetch hotels:", error);
       }
     }
     getHotels();
@@ -219,7 +219,7 @@ export default function Home() {
       const updatedHotels = await fetchHotels();
       setHotels(updatedHotels);
     } catch (error) {
-      // console.error("Failed to create hotel:", error);
+      console.error("Failed to create hotel:", error);
     }
   };
 
@@ -244,7 +244,7 @@ export default function Home() {
         setHotels(hotels.filter((hotel) => hotel.id !== id));
         alert("Hotel deleted successfully!");
       } catch (error) {
-        // console.error("Failed to delete hotel:", error);
+        console.error("Failed to delete hotel:", error);
       }
     }
   };
@@ -260,7 +260,7 @@ export default function Home() {
       const updatedHotels = await fetchHotels();
       setHotels(updatedHotels);
     } catch (error) {
-      // console.error("Failed to update hotel:", error);
+      console.error("Failed to update hotel:", error);
     }
   };
 
