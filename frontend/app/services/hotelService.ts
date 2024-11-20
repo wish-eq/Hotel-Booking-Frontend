@@ -1,5 +1,5 @@
-
 import { Hotel, FormState } from "../interface";
+import { getSession } from "@/app/utils/session";
 
 // user, admin
 export async function fetchHotels(): Promise<Hotel[]> {
@@ -13,44 +13,64 @@ export async function fetchHotels(): Promise<Hotel[]> {
 
 // admin
 export async function createHotel(hotelData: FormState) {
+  const session = getSession(); // Retrieve session
+  if (!session || !session.token) {
+    throw new Error("No token found. Please log in.");
+  }
+
   const response = await fetch("http://localhost:5000/api/v1/hotels", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmRlYmIyNWM2ZjQ5MWJjMjI3YzQ2OCIsImlhdCI6MTczMTA4NDM5NSwiZXhwIjoxNzYyNjIwMzk1fQ.ztVEJk6BXQYLly1ujF2v2eN5wzSdsb0NKdY9tdSI06A",
+      Authorization: `Bearer ${session.token}`, // Use token from session
     },
     body: JSON.stringify(hotelData),
   });
+
   if (!response.ok) {
     throw new Error("Failed to create hotel");
   }
+
   return await response.json();
 }
 
 // admin
 export async function updateHotel(id: string, hotelData: FormState) {
+  const session = getSession(); // Retrieve session
+  if (!session || !session.token) {
+    throw new Error("No token found. Please log in.");
+  }
+
   const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmRlYmIyNWM2ZjQ5MWJjMjI3YzQ2OCIsImlhdCI6MTczMTA4NDM5NSwiZXhwIjoxNzYyNjIwMzk1fQ.ztVEJk6BXQYLly1ujF2v2eN5wzSdsb0NKdY9tdSI06A",
+      Authorization: `Bearer ${session.token}`, // Use token from session
     },
     body: JSON.stringify(hotelData),
   });
+
   if (!response.ok) {
     throw new Error("Failed to update hotel");
   }
+
   return await response.json();
 }
 
 // admin
 export async function deleteHotel(id: string) {
+  const session = getSession(); // Retrieve session
+  if (!session || !session.token) {
+    throw new Error("No token found. Please log in.");
+  }
+
   const response = await fetch(`http://localhost:5000/api/v1/hotels/${id}`, {
     method: "DELETE",
     headers: {
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmRlYmIyNWM2ZjQ5MWJjMjI3YzQ2OCIsImlhdCI6MTczMTA4NDM5NSwiZXhwIjoxNzYyNjIwMzk1fQ.ztVEJk6BXQYLly1ujF2v2eN5wzSdsb0NKdY9tdSI06A",
+      Authorization: `Bearer ${session.token}`, // Use token from session
     },
   });
+
   if (!response.ok) {
     throw new Error("Failed to delete hotel");
   }

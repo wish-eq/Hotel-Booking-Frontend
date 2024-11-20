@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState, ChangeEvent } from "react";
+import { getSession, clearSession } from "@/app/utils/session";
 import TopMenu from "@/app/components/TopMenu";
+import { useRouter } from "next/navigation";
+
 import {
   fetchHotels,
   createHotel,
@@ -23,6 +26,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useTheme } from "../ThemeProvider";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
+import { getUserInfo } from "../services/authService";
 
 interface FormState {
   name: string;
@@ -34,7 +38,18 @@ interface FormState {
   picture: string;
 }
 
+interface UserInfo {
+  data: {
+    role: string;
+    name: string;
+    email: string;
+    [key: string]: any; // If there are other unknown fields
+  };
+}
+
 export default function Home() {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
   const { isDarkMode } = useTheme();
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [createForm, setCreateForm] = useState<FormState>({
@@ -55,6 +70,39 @@ export default function Home() {
     tel: "",
     picture: "",
   });
+  const [session, setSession] = useState<any>(null); // Add state to track session
+  const router = useRouter();
+
+  useEffect(() => {
+    const currentSession = getSession(); // Retrieve session from cookies
+    if (currentSession) {
+      setSession(currentSession); // Set session state
+      console.log("Session retrieved:", currentSession); // Log session here
+    } else {
+      router.push("/auth/login"); // Redirect to login if session is missing
+    }
+  }, []);
+
+  useEffect(() => {
+    async function fetchUserInfo() {
+      try {
+        const user = await getUserInfo();
+        setUserInfo(user); // Set user information
+        console.log("User Info:", user); // Debugging
+      } catch (err: any) {
+        console.log("get user fail");
+      }
+    }
+
+    fetchUserInfo();
+  }, []);
+
+  const handleLogout = () => {
+    clearSession(); // Clear session from cookies
+    setSession(null); // Reset session state
+    router.push("auth/login"); // Redirect to login page
+  };
+
   const [isEditing, setIsEditing] = useState(false);
   const [currentHotelId, setCurrentHotelId] = useState<string | null>(null);
   const [isBooking, setIsBooking] = useState(false);
@@ -75,7 +123,7 @@ export default function Home() {
         const data = await fetchHotels();
         setHotels(data);
       } catch (error) {
-        console.error("Failed to fetch hotels:", error);
+        // console.error("Failed to fetch hotels:", error);
       }
     }
     getHotels();
@@ -137,7 +185,7 @@ export default function Home() {
       alert("Booking created successfully!");
       setIsBooking(false);
     } catch (error) {
-      console.error("Failed to create booking:", error);
+      // console.error("Failed to create booking:", error);
     }
   };
 
@@ -147,10 +195,11 @@ export default function Home() {
         const data = await fetchHotels();
         setHotels(data);
       } catch (error) {
-        console.error("Failed to fetch hotels:", error);
+        // console.error("Failed to fetch hotels:", error);
       }
     }
     getHotels();
+    console.log(session);
   }, []);
 
   const handleSubmit = async () => {
@@ -170,7 +219,7 @@ export default function Home() {
       const updatedHotels = await fetchHotels();
       setHotels(updatedHotels);
     } catch (error) {
-      console.error("Failed to create hotel:", error);
+      // console.error("Failed to create hotel:", error);
     }
   };
 
@@ -195,7 +244,7 @@ export default function Home() {
         setHotels(hotels.filter((hotel) => hotel.id !== id));
         alert("Hotel deleted successfully!");
       } catch (error) {
-        console.error("Failed to delete hotel:", error);
+        // console.error("Failed to delete hotel:", error);
       }
     }
   };
@@ -211,7 +260,7 @@ export default function Home() {
       const updatedHotels = await fetchHotels();
       setHotels(updatedHotels);
     } catch (error) {
-      console.error("Failed to update hotel:", error);
+      // console.error("Failed to update hotel:", error);
     }
   };
 
@@ -221,7 +270,6 @@ export default function Home() {
         isDarkMode ? "bg-black text-white" : "bg-white text-black"
       } transition-colors duration-300`}
     >
-      {" "}
       <TopMenu />
       {isBooking && (
         <Dialog
@@ -575,30 +623,35 @@ export default function Home() {
                     >
                       Tel: {hotel.tel}
                     </p>
-                    <div className="absolute top-2 right-2 flex space-x-2">
-                      <button
-                        onClick={() => handleEditClick(hotel)}
-                        className={`p-2 rounded-full focus:outline-none ${
-                          isDarkMode
-                            ? "bg-yellow-700 hover:bg-yellow-600 text-white"
-                            : "bg-yellow-300 hover:bg-yellow-400 text-black"
-                        }`}
-                        aria-label="Edit Hotel"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(hotel.id)}
-                        className={`p-2 rounded-full focus:outline-none ${
-                          isDarkMode
-                            ? "bg-red-700 hover:bg-red-600 text-white"
-                            : "bg-red-300 hover:bg-red-400 text-black"
-                        }`}
-                        aria-label="Delete Hotel"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
+                    {userInfo?.data.role == "admin" && (
+                      <>
+                        <div className="absolute top-2 right-2 flex space-x-2">
+                          <button
+                            onClick={() => handleEditClick(hotel)}
+                            className={`p-2 rounded-full focus:outline-none ${
+                              isDarkMode
+                                ? "bg-yellow-700 hover:bg-yellow-600 text-white"
+                                : "bg-yellow-300 hover:bg-yellow-400 text-black"
+                            }`}
+                            aria-label="Edit Hotel"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(hotel.id)}
+                            className={`p-2 rounded-full focus:outline-none ${
+                              isDarkMode
+                                ? "bg-red-700 hover:bg-red-600 text-white"
+                                : "bg-red-300 hover:bg-red-400 text-black"
+                            }`}
+                            aria-label="Delete Hotel"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </>
+                    )}
+
                     <button
                       onClick={() => handleBookingClick(hotel.id)}
                       className="mt-4 w-full p-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
@@ -611,118 +664,124 @@ export default function Home() {
             ))}
         </div>
 
-        <h1
-          className={`text-3xl font-bold mt-16 text-center ${
-            isDarkMode ? "text-white" : "text-black"
-          }`}
-        >
-          Create a New Hotel
-        </h1>
-        <div
-          className={`max-w-lg mx-auto mt-4 p-6 rounded-lg shadow-lg ${
-            isDarkMode ? "bg-gray-900 text-white" : "bg-white text-black"
-          }`}
-        >
-          <label className="block mb-1">Hotel Name</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Hotel Name"
-            value={createForm.name}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">Address</label>
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={createForm.address}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">District</label>
-          <input
-            type="text"
-            name="district"
-            placeholder="District"
-            value={createForm.district}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">Province</label>
-          <input
-            type="text"
-            name="province"
-            placeholder="Province"
-            value={createForm.province}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">Postal Code</label>
-          <input
-            type="text"
-            name="postalcode"
-            placeholder="Postal Code"
-            value={createForm.postalcode}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">Tel</label>
-          <input
-            type="text"
-            name="tel"
-            placeholder="Tel"
-            value={createForm.tel}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <label className="block mb-1">Picture URL</label>
-          <input
-            type="text"
-            name="picture"
-            placeholder="Picture URL"
-            value={createForm.picture}
-            onChange={(e) => handleInputChange(e, "create")}
-            className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-gray-100 border-gray-300 text-black"
-            }`}
-          />
-          <button
-            onClick={handleSubmit}
-            className={`w-full p-3 font-semibold rounded hover:bg-blue-600 transition-colors duration-300 ${
-              isDarkMode ? "bg-blue-500 text-white" : "bg-blue-500 text-white"
-            }`}
-          >
-            Create New Hotel
-          </button>
-        </div>
+        {userInfo?.data.role == "admin" && (
+          <>
+            <h1
+              className={`text-3xl font-bold mt-16 text-center ${
+                isDarkMode ? "text-white" : "text-black"
+              }`}
+            >
+              Create a New Hotel
+            </h1>
+            <div
+              className={`max-w-lg mx-auto mt-4 p-6 rounded-lg shadow-lg ${
+                isDarkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+              }`}
+            >
+              <label className="block mb-1">Hotel Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Hotel Name"
+                value={createForm.name}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">Address</label>
+              <input
+                type="text"
+                name="address"
+                placeholder="Address"
+                value={createForm.address}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">District</label>
+              <input
+                type="text"
+                name="district"
+                placeholder="District"
+                value={createForm.district}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">Province</label>
+              <input
+                type="text"
+                name="province"
+                placeholder="Province"
+                value={createForm.province}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">Postal Code</label>
+              <input
+                type="text"
+                name="postalcode"
+                placeholder="Postal Code"
+                value={createForm.postalcode}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">Tel</label>
+              <input
+                type="text"
+                name="tel"
+                placeholder="Tel"
+                value={createForm.tel}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <label className="block mb-1">Picture URL</label>
+              <input
+                type="text"
+                name="picture"
+                placeholder="Picture URL"
+                value={createForm.picture}
+                onChange={(e) => handleInputChange(e, "create")}
+                className={`block w-full p-3 mb-4 rounded border focus:ring focus:ring-yellow-500 outline-none ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-600 text-white"
+                    : "bg-gray-100 border-gray-300 text-black"
+                }`}
+              />
+              <button
+                onClick={handleSubmit}
+                className={`w-full p-3 font-semibold rounded hover:bg-blue-600 transition-colors duration-300 ${
+                  isDarkMode
+                    ? "bg-blue-500 text-white"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
+                Create New Hotel
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
