@@ -10,11 +10,11 @@ export default function SignOut() {
         const session = await getSession();
         if (session) {
             await signOut({ redirect: false });
-            router.push('/');
+            router.push('/auth/signin');
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
-        } router.back();
+        } router.push('/auth/signin');
     };
 
     return (
