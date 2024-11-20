@@ -76,6 +76,8 @@ export default function TopMenu() {
         <div className="flex items-center space-x-2">
           <Image
             src={`https://picsum.photos/seed/${userInfo.data.name}/50`} // Dynamic image seed
+            width={50} // Set the width
+            height={50} // Set the height
             alt="User Profile"
             className="w-10 h-10 rounded-full border border-gray-300"
           />

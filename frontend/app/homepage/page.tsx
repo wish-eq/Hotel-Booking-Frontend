@@ -593,6 +593,8 @@ export default function Home() {
                   <Image
                     src="https://picsum.photos/1280/720/?hotel%20lobby"
                     alt={`${hotel.name} Image`}
+                    width={1280}
+                    height={720}
                     className="w-full h-48 object-cover rounded-t-lg mb-4"
                   />
                   <div className="p-4">
